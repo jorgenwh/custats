@@ -10,7 +10,7 @@ def poisson_logpmf(k, r):
     assert k.dtype == __np.int32, "k.dtype must be np.int32"
     assert r.dtype == __np.float32, "r.dtype must be np.float32"
     assert k.shape == r.shape, "k and r must have equal shapes"
-    assert isinstance(k, (__np.ndarray, __cp.ndarray)) and isinstance(r, (__np.ndarray, __cp.ndarray)), "k and r must be numpy or cupy arrays"
+    assert isinstance(k, (__np.ndarray, __cp.ndarray)) and isinstance(r, (__np.ndarray, __cp.ndarray))
 
     if isinstance(k, __np.ndarray) and isinstance(r, __np.ndarray):
         return __poisson_logpmf_hh2h(k, r)

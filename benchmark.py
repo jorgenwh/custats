@@ -30,7 +30,7 @@ times = {
 
 for i in range(1, num_runs+1):
     k = np.random.randint(low=1, high=100, size=size, dtype=np.int32)
-    r = np.random.uniform(low=1, high=100, size=size)
+    r = np.random.uniform(low=1, high=100, size=size).astype(np.float32)
     k_d = cp.asarray(k)
     r_d = cp.asarray(r)
 
