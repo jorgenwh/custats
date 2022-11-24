@@ -10,7 +10,7 @@ void poisson_logpmf_hh2h(const int *k, const double *r, double *out, const int s
   double *r_d, *out_d;
   cuda_errchk(cudaMalloc(&k_d, size*sizeof(int)));
   cuda_errchk(cudaMalloc(&r_d, size*sizeof(double)));
-  cuda_errchk(cuda_errchk(cudaMalloc(&out_d, size*sizeof(double)));
+  cuda_errchk(cudaMalloc(&out_d, size*sizeof(double)));
   cuda_errchk(cudaMemcpy(k_d, k, size*sizeof(int), cudaMemcpyHostToDevice));
   cuda_errchk(cudaMemcpy(r_d, r, size*sizeof(double), cudaMemcpyHostToDevice));
 
