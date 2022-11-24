@@ -12,6 +12,7 @@ set(SOURCE_DIR "custats/backend")
 include_directories(${SOURCE_DIR})
 
 set(SOURCES 
+  "${SOURCE_DIR}/functions.cu"
   "${SOURCE_DIR}/kernels.cu"
 )
 
