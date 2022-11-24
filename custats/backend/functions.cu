@@ -17,6 +17,9 @@ void poisson_logpmf_hh2h(const int *k, const double *r, double *out, const int s
   kernels::call_poisson_logpmf_kernel(k_d, r_d, out_d, size);
 
   cuda_errchk(cudaMemcpy(out, out_d, size*sizeof(double), cudaMemcpyDeviceToHost));
+  cuda_errchk(cudaFree(k_d));
+  cuda_errchk(cudaFree(r_d));
+  cuda_errchk(cudaFree(out_d));
 }
 
 void poisson_logpmf_dh2d(const int *k, const double *r, double *out, const int size)
@@ -26,6 +29,8 @@ void poisson_logpmf_dh2d(const int *k, const double *r, double *out, const int s
   cuda_errchk(cudaMemcpy(r_d, r, size*sizeof(double), cudaMemcpyHostToDevice));
 
   kernels::call_poisson_logpmf_kernel(k, r_d, out, size);
+
+  cuda_errchk(cudaFree(r_d));
 }
 
 void poisson_logpmf_hd2d(const int *k, const double *r, double *out, const int size)
@@ -35,6 +40,8 @@ void poisson_logpmf_hd2d(const int *k, const double *r, double *out, const int s
   cuda_errchk(cudaMemcpy(k_d, k, size*sizeof(int), cudaMemcpyHostToDevice));
 
   kernels::call_poisson_logpmf_kernel(k_d, r, out, size);
+
+  cuda_errchk(cudaFree(k_d));
 }
 
 void poisson_logpmf_dd2d(const int *k, const double *r, double *out, const int size)
