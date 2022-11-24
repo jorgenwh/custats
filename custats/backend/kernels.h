@@ -8,7 +8,7 @@
 
 namespace kernels {
 
-;
+void call_poisson_logpmf_kernel(const int *k, const double *r, double *out, const int size);
 
 } // kernels
 

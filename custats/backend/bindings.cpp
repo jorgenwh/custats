@@ -49,9 +49,8 @@ PYBIND11_MODULE(custats_backend, m)
 
   m.def("poisson_logpmf_dd2d", [](long k_ptr, long r_ptr, long out_ptr, int size)
   {
-    const int size = r.size();
     const int *k_data = reinterpret_cast<int *>(k_ptr);
-    const double *r_data = r.data();
+    const double *r_data = reinterpret_cast<double *>(r_ptr);
     double *out_data = reinterpret_cast<double *>(out_ptr);
     poisson_logpmf_dd2d(k_data, r_data, out_data, size);
   });
