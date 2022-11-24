@@ -15,7 +15,7 @@ size = 40_000_000
 
 # k, r and reference output initialized in the host RAM
 k = np.random.randint(low=1, high=100, size=size, dtype=np.int32)
-r = np.random.uniform(low=1, high=100, size=size)
+r = np.random.uniform(low=1, high=100, size=size).astype(np.float32)
 ref_out = ref(k, r)
 
 # k, r and reference output copied to device RAM
@@ -52,8 +52,8 @@ assert \
         out_hh2h.shape == out_dh2d.shape == out_hd2d.shape == out_dd2d.shape
 
 assert k.dtype == k_d.dtype == np.int32
-assert r.dtype == r_d.dtype == np.float64
-assert out_hh2h.dtype == out_dh2d.dtype == out_hd2d.dtype == out_dd2d.dtype == np.float64
+assert r.dtype == r_d.dtype == np.float32
+assert out_hh2h.dtype == out_dh2d.dtype == out_hd2d.dtype == out_dd2d.dtype == np.float32
 
 np.testing.assert_almost_equal(out_hh2h, ref_out, decimal=4)
 cp.testing.assert_array_almost_equal(out_dh2d, ref_out_d, decimal=4)

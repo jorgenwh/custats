@@ -7,7 +7,7 @@
 namespace kernels {
 
 __global__ static void poisson_logpmf_kernel(
-    const int *k, const double *r, double *out, const int size)
+    const int *k, const float *r, float *out, const int size)
 {
   int i = blockIdx.x * blockDim.x + threadIdx.x;
   if (i < size)
@@ -16,7 +16,7 @@ __global__ static void poisson_logpmf_kernel(
   }
 }
 
-void call_poisson_logpmf_kernel(const int *k, const double *r, double *out, const int size)
+void call_poisson_logpmf_kernel(const int *k, const float *r, float *out, const int size)
 {
   poisson_logpmf_kernel<<<SDIV(size, THREAD_BLOCK_SIZE), THREAD_BLOCK_SIZE>>>(
       k, r, out, size);
