@@ -1,0 +1,4 @@
+cupy-cuda11x==11.3.0
+fastrlock==0.8.1
+numpy==1.23.5
+scipy==1.9.3
