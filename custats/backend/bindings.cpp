@@ -54,4 +54,17 @@ PYBIND11_MODULE(custats_backend, m)
     double *out_data = reinterpret_cast<double *>(out_ptr);
     poisson_logpmf_dd2d(k_data, r_data, out_data, size);
   });
+
+  m.def("_logpmf", [](long observed_counts_ptr, std::vector<int> observed_counts_shape, long counts_ptr, std::vector<int> counts_shape, float base_lambda, float error_rate, long out_ptr, std::vector<int> out_shape)
+  {
+    int *observed_counts = reinterpret_cast<int *>(observed_counts_ptr);
+    float *counts = reinterpret_cast<float *>(counts_ptr);
+    float *out = reinterpret_cast<float *>(out_ptr);
+
+    poisson_logpmf_experimental(
+        observed_counts, observed_counts_shape, 
+        counts, counts_shape,
+        base_lambda, error_rate, 
+        out, out_shape);
+  });
 }

@@ -1,6 +1,7 @@
 import numpy as np
 import cupy as cp
 import scipy
+import random
 
 from custats import poisson_logpmf
 

@@ -6,6 +6,8 @@ from custats_backend import poisson_logpmf_dh2d as __poisson_logpmf_dh2d
 from custats_backend import poisson_logpmf_hd2d as __poisson_logpmf_hd2d
 from custats_backend import poisson_logpmf_dd2d as __poisson_logpmf_dd2d
 
+from custats_backend import _logpmf as __backend_logpmf
+
 def poisson_logpmf(k, r):
     assert k.dtype == __np.int32, "k.dtype must be np.int32"
     assert r.dtype == __np.float64, "r.dtype must be np.float64"
@@ -28,3 +30,14 @@ def poisson_logpmf(k, r):
         return out
 
     return NotImplemented
+
+def experimental_logpmf(observed_counts, counts, base_lambda, error_rate):
+    out = __cp.zeros_like(observed_counts, dtype=__np.float64)
+
+    __backend_logpmf(
+        observed_counts.data.ptr, observed_counts.shape,
+        counts.data.ptr, counts.shape,
+        base_lambda, error_rate,
+        out.data.ptr, out.shape)
+
+    return out
