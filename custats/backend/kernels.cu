@@ -1,4 +1,3 @@
-#include <iostream>
 #include <inttypes.h>
 #include <cuda_runtime.h>
 
@@ -59,7 +58,13 @@ void call_poisson_logpmf_experimental_kernel(
     int *observed_counts, float *counts, float base_lambda, float error_rate, 
     float *out, int n_counts)
 {
-  poisson_logpmf_experimental_kernel<<<SDIV(n_counts, THREAD_BLOCK_SIZE), THREAD_BLOCK_SIZE>>>(
+  int min_grid_size;
+  int thread_block_size;
+  cuda_errchk(cudaOccupancyMaxPotentialBlockSize(
+      &min_grid_size, &thread_block_size, 
+      poisson_logpmf_experimental_kernel, 0, 0));
+
+  poisson_logpmf_experimental_kernel<<<SDIV(n_counts, thread_block_size), thread_block_size>>>(
       observed_counts, counts, base_lambda, error_rate, out, n_counts);
 }
 
