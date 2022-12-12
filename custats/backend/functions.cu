@@ -58,5 +58,7 @@ void poisson_logpmf_experimental(
     float base_lambda, float error_rate, 
     float *out, std::vector<int> &out_shape)
 {
-  // TODO and also create kernel
+  int n_counts = observed_counts_shape[0];
+  kernels::call_poisson_logpmf_experimental_kernel(
+      observed_counts, counts, base_lambda, error_rate, out, n_counts);
 }
