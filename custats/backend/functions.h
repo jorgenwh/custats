@@ -15,7 +15,7 @@ void poisson_logpmf_hd2d(const int *k, const double *r, double *out, const int s
 void poisson_logpmf_dd2d(const int *k, const double *r, double *out, const int size);
 
 void poisson_logpmf_experimental(
-    unsigned int *observed_counts, float *counts, unsigned int n_counts,
-    float base_lambda, float error_rate, float *out);
+    const unsigned int *observed_counts, const float *counts, const unsigned int n_counts,
+    const float base_lambda, const float error_rate, float *out);
 
 #endif // FUNCTIONS_H_

@@ -24,8 +24,8 @@ void call_poisson_logpmf_kernel(const int *k, const double *r, double *out, cons
 }
 
 __global__ static void poisson_logpmf_experimental_kernel(
-    unsigned int *observed_counts, float *counts, unsigned int n_counts,
-    float base_lambda, float error_rate, float *out)
+    const unsigned int *observed_counts, const float *counts, const unsigned int n_counts,
+    const float base_lambda, const float error_rate, float *out)
 {
   int gtid = blockIdx.x * blockDim.x + threadIdx.x;
   int i_offset = gtid * 5;
@@ -55,8 +55,8 @@ __global__ static void poisson_logpmf_experimental_kernel(
 }
 
 void call_poisson_logpmf_experimental_kernel(
-    unsigned int *observed_counts, float *counts, unsigned int n_counts,
-    float base_lambda, float error_rate, float *out)
+    const unsigned int *observed_counts, const float *counts, const unsigned int n_counts,
+    const float base_lambda, const float error_rate, float *out)
 {
   int min_grid_size;
   int thread_block_size;
