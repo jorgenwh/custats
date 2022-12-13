@@ -53,12 +53,10 @@ void poisson_logpmf_dd2d(const int *k, const double *r, double *out, const int s
 }
 
 void poisson_logpmf_experimental(
-    int *observed_counts, std::vector<int> &observed_counts_shape, 
-    float *counts, std::vector<int> &counts_shape,
-    float base_lambda, float error_rate, 
-    float *out, std::vector<int> &out_shape)
+    unsigned int *observed_counts, float *counts, unsigned int n_counts,
+    float base_lambda, float error_rate, float *out)
 {
-  int n_counts = observed_counts_shape[0];
   kernels::call_poisson_logpmf_experimental_kernel(
-      observed_counts, counts, base_lambda, error_rate, out, n_counts);
+      observed_counts, counts, n_counts, base_lambda, error_rate, out);
 }
+

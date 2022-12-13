@@ -33,11 +33,7 @@ def poisson_logpmf(k, r):
 
 def experimental_logpmf(observed_counts, counts, base_lambda, error_rate):
     out = __cp.zeros_like(observed_counts, dtype=__np.float32)
-
+    n_counts = counts.shape[0]
     __backend_logpmf(
-        observed_counts.data.ptr, observed_counts.shape,
-        counts.data.ptr, counts.shape,
-        base_lambda, error_rate,
-        out.data.ptr, out.shape)
-
+        observed_counts.data.ptr, counts.data.ptr, n_counts, base_lambda, error_rate, out.data.ptr)
     return out

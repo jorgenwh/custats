@@ -1,3 +1,4 @@
+#include <iostream>
 #include <inttypes.h>
 #include <cuda_runtime.h>
 
@@ -23,17 +24,16 @@ void call_poisson_logpmf_kernel(const int *k, const double *r, double *out, cons
 }
 
 __global__ static void poisson_logpmf_experimental_kernel(
-    int *observed_counts, float *counts, 
-    float base_lambda, float error_rate,
-    float *out, int n_counts)
+    unsigned int *observed_counts, float *counts, unsigned int n_counts,
+    float base_lambda, float error_rate, float *out)
 {
   int gtid = blockIdx.x * blockDim.x + threadIdx.x;
   int i_offset = gtid * 5;
 
   __shared__ float poisson_lambda[5];
-  if (gtid < 5)
+  if (threadIdx.x < 5)
   {
-    poisson_lambda[gtid] = (gtid + error_rate) * base_lambda;
+    poisson_lambda[threadIdx.x] = (threadIdx.x + error_rate) * base_lambda;
   }
   __syncthreads();
 
@@ -55,8 +55,8 @@ __global__ static void poisson_logpmf_experimental_kernel(
 }
 
 void call_poisson_logpmf_experimental_kernel(
-    int *observed_counts, float *counts, float base_lambda, float error_rate, 
-    float *out, int n_counts)
+    unsigned int *observed_counts, float *counts, unsigned int n_counts,
+    float base_lambda, float error_rate, float *out)
 {
   int min_grid_size;
   int thread_block_size;
@@ -65,7 +65,7 @@ void call_poisson_logpmf_experimental_kernel(
       poisson_logpmf_experimental_kernel, 0, 0));
 
   poisson_logpmf_experimental_kernel<<<SDIV(n_counts, thread_block_size), thread_block_size>>>(
-      observed_counts, counts, base_lambda, error_rate, out, n_counts);
+      observed_counts, counts, n_counts, base_lambda, error_rate, out);
 }
 
 } // kernels

@@ -9,8 +9,8 @@
 namespace kernels {
 
 void call_poisson_logpmf_kernel(const int *k, const double *r, double *out, const int size);
-void call_poisson_logpmf_experimental_kernel(int *observed_counts, float *counts, 
-    float base_lambda, float error_rate, float *out, int n_counts);
+void call_poisson_logpmf_experimental_kernel(unsigned int *observed_counts, float *counts, 
+    unsigned int n_counts, float base_lambda, float error_rate, float *out);
 
 } // kernels
 
