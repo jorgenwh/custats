@@ -22,7 +22,7 @@ def func(observed_counts, counts, base_lambda, error_rate):
     return prob
 
 def profile_logpmf_func(logpmf_func, n_counts, runs):
-    total_t = 0
+    total_ns = 0
 
     print(f"Profiling {logpmf_func}")
     for i in range(runs):
@@ -34,17 +34,17 @@ def profile_logpmf_func(logpmf_func, n_counts, runs):
             observed_counts = cp.asanyarray(observed_counts)
             model_counts = cp.asanyarray(model_counts.astype(np.float32))
 
-        t = time.time()
+        t = time.time_ns()
         result = logpmf_func(observed_counts, model_counts, BASE_LAMBDA, ERROR_RATE)
         cp.cuda.runtime.deviceSynchronize()
-        total_t += (time.time() - t)
+        total_ns += (time.time_ns() - t)
 
         print(f"{i}/{runs}", end="\r")
     print(f"{runs}/{runs}")
 
-    return total_t / runs
+    return total_ns / runs
 
-def assert_logpmf_func_correctness(experimental_func, reference_func, n_counts, runs):
+def assert_logpmf_func_correctness(experimental_func, reference_func, n_counts, runs, threshold=0.01):
     print("Asserting correctness")
     for i in range(runs):
         observed_counts = np.random.randint(0, 20, n_counts, dtype=np.int32)
@@ -56,14 +56,17 @@ def assert_logpmf_func_correctness(experimental_func, reference_func, n_counts, 
         experimental_result = experimental_func(observed_counts_d, model_counts_d, BASE_LAMBDA, ERROR_RATE)
         experimental_result_h = cp.asnumpy(experimental_result)
 
-        np.allclose(experimental_result_h, reference_result)
+        assert np.isfinite(experimental_result_h).all()
         assert experimental_result_h.shape == reference_result.shape
+        assert np.allclose(experimental_result_h, reference_result, rtol=threshold)
 
         print(f"{i}/{runs}", end="\r")
     print(f"{runs}/{runs}")
 
 if __name__ == "__main__":
-    n_counts = 50000
+    n_counts = 50000 
+    runs = 100
+    tolerance_threshold = 0.003
 
     assert_correctness = True
     profile = True
@@ -71,12 +74,16 @@ if __name__ == "__main__":
     if assert_correctness:
         assert_logpmf_func_correctness(
                 experimental_func=experimental_logpmf, reference_func=func,
-                n_counts=n_counts, runs=100)
+                n_counts=n_counts, runs=runs, threshold=tolerance_threshold)
 
     if profile:
-        t1 = profile_logpmf_func(logpmf_func=func, n_counts=n_counts, runs=1000)
-        t2 = profile_logpmf_func(logpmf_func=experimental_logpmf, n_counts=n_counts, runs=1000)
+        ns_call_h = profile_logpmf_func(logpmf_func=func, n_counts=n_counts, runs=runs)
+        ns_call_d = profile_logpmf_func(logpmf_func=experimental_logpmf, n_counts=n_counts, runs=runs)
+        ms_call_h = ns_call_h / 1e6
+        ms_call_d = ns_call_d / 1e6
+        s_call_h = ns_call_h / 1e9
+        s_call_d = ns_call_d / 1e9
 
-        print(f"mean time per call (func, CPU)                : {round(t1, 5)}s")
-        print(f"mean time per call (experimental_logpmf, GPU) : {round(t2, 5)}s")
-        print(f"GPU solution was {round(t1/t2, 1)}x faster")
+        print(f"mean time per call (func, CPU)                : {round(ms_call_h, 5)} ms")
+        print(f"mean time per call (experimental_logpmf, GPU) : {round(ms_call_d, 5)} ms")
+        print(f"GPU solution was {round(ns_call_h/ns_call_d, 1)}x faster")
