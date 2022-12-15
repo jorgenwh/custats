@@ -77,7 +77,7 @@ setup(
     description="",
     long_description="",
     packages=find_packages("custats"),
-    package_dir={"":"custats"},
+    #package_dir={"":"custats"},
     ext_modules=[CMakeExtension("custats_backend")],
     cmdclass=dict(build_ext=CMakeBuild),
     zip_safe=False,
