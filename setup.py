@@ -72,7 +72,7 @@ class CMakeBuild(build_ext):
 
 setup(
     name="custats",
-    version="0.0.1",
+    version="1.0.0",
     author="Jørgen Henriksen",
     description="",
     packages=["custats"],
