@@ -1,6 +1,5 @@
 #include <inttypes.h>
 #include <string>
-
 #include <cuda_runtime.h>
 
 #include <pybind11/pybind11.h>

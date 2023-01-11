@@ -14,7 +14,7 @@
 
 inline void cuda_errcheck(cudaError_t code, const char *file, int line, bool abort=true) 
 {
-#ifdef _CUDA_ERROR_CHECK
+#ifdef __CUDA_ERROR_CHECK__
   if (code != cudaSuccess) 
   {
     switch (code) 
@@ -27,7 +27,7 @@ inline void cuda_errcheck(cudaError_t code, const char *file, int line, bool abo
     }
     exit(code);
   }
-#endif // _CUDA_ERROR_CHECK
+#endif // __CUDA_ERROR_CHECK__
 }
 
 #endif // COMMON_H_
