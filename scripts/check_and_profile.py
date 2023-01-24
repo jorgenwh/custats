@@ -9,6 +9,7 @@ from custats import experimental_logpmf
 
 BASE_LAMBDA = 7.5
 ERROR_RATE = 0.01
+NUM_MODEL_COUNTS = 15
 
 def fast_poisson_logpmf(k, r):
     return k * np.log(r) - r - scipy.special.gammaln(k+1)
@@ -27,7 +28,7 @@ def profile_logpmf_func(logpmf_func, n_counts, runs):
     print(f"Profiling {logpmf_func}")
     for i in range(runs):
         observed_counts = np.random.randint(0, 20, n_counts, dtype=np.int32)
-        model_counts = (np.random.randint(0, 100, (n_counts, 5)) / 10).astype(np.float16) + 0.1
+        model_counts = (np.random.randint(0, 100, (n_counts, NUM_MODEL_COUNTS)) / 10).astype(np.float16) + 0.1
 
         # If using the experimental GPU solution, copy data to GPU and convert model_counts from f16 to f32
         if logpmf_func == experimental_logpmf:
@@ -46,9 +47,10 @@ def profile_logpmf_func(logpmf_func, n_counts, runs):
 
 def assert_logpmf_func_correctness(experimental_func, reference_func, n_counts, runs, threshold=0.01):
     print("Asserting correctness")
+    max_dev = 0
     for i in range(runs):
         observed_counts = np.random.randint(0, 20, n_counts, dtype=np.int32)
-        model_counts = (np.random.randint(0, 100, (n_counts, 5)) / 10).astype(np.float16) + 0.1
+        model_counts = (np.random.randint(0, 100, (n_counts, NUM_MODEL_COUNTS)) / 10).astype(np.float16) + 0.1
         observed_counts_d = cp.asarray(observed_counts)
         model_counts_d = cp.asarray(model_counts.astype(np.float32))
 
@@ -60,12 +62,17 @@ def assert_logpmf_func_correctness(experimental_func, reference_func, n_counts, 
         assert experimental_result_h.shape == reference_result.shape
         assert np.allclose(experimental_result_h, reference_result, rtol=threshold)
 
+        dev = np.max(abs(experimental_result_h - reference_result))
+        max_dev = max(max_dev, dev)
+
         print(f"{i}/{runs}", end="\r")
     print(f"{runs}/{runs}")
 
+    print(f"largest deviation={max_dev}")
+
 if __name__ == "__main__":
-    n_counts = 50000 
-    runs = 100
+    n_counts = 500000
+    runs = 1000
     tolerance_threshold = 0.003
 
     assert_correctness = True

@@ -5,6 +5,7 @@
 #include <cuda_runtime.h>
 
 #define THREAD_BLOCK_SIZE 128
+#define MODEL_COUNTS 15
 
 #ifndef SDIV
   #define SDIV(x,y)(((x)+(y)-1)/(y))

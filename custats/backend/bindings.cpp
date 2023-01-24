@@ -54,12 +54,12 @@ PYBIND11_MODULE(custats_backend, m)
     poisson_logpmf_dd2d(k_data, r_data, out_data, size);
   });
 
-  m.def("_logpmf", [](long observed_counts_ptr, long counts_ptr, const unsigned int n_counts, const float base_lambda, const float error_rate, long out_ptr)
+  m.def("_logpmf", [](long observed_counts_ptr, long counts_ptr, const unsigned int n_counts, 
+        const float base_lambda, const float error_rate, long out_ptr)
   {
     const unsigned int *observed_counts = reinterpret_cast<unsigned int *>(observed_counts_ptr);
     const float *counts = reinterpret_cast<float *>(counts_ptr);
     float *out = reinterpret_cast<float *>(out_ptr);
-    poisson_logpmf_experimental(observed_counts, counts, n_counts,
-        base_lambda, error_rate, out);
+    poisson_logpmf_experimental(observed_counts, counts, n_counts, base_lambda, error_rate, out);
   });
 }

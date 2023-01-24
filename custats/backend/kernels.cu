@@ -28,10 +28,10 @@ __global__ static void poisson_logpmf_experimental_kernel(
     const float base_lambda, const float error_rate, float *out)
 {
   int gtid = blockIdx.x * blockDim.x + threadIdx.x;
-  int i_offset = gtid * 5;
+  int i_offset = gtid * MODEL_COUNTS;
 
-  __shared__ float poisson_lambda[5];
-  if (threadIdx.x < 5)
+  __shared__ float poisson_lambda[MODEL_COUNTS];
+  if (threadIdx.x < MODEL_COUNTS)
   {
     poisson_lambda[threadIdx.x] = (threadIdx.x + error_rate) * base_lambda;
   }
@@ -39,14 +39,14 @@ __global__ static void poisson_logpmf_experimental_kernel(
 
   float sum = 0.0f;
 #pragma unroll
-  for (int i = 0; i < 5; i++)
+  for (int i = 0; i < MODEL_COUNTS; i++)
   {
     sum += counts[i_offset + i];
   }
 
   float output = 0.0f;
 #pragma unroll
-  for (int i = 0; i < 5; i++)
+  for (int i = 0; i < MODEL_COUNTS; i++)
   {
     output += expf(((observed_counts[gtid] * logf(poisson_lambda[i])) - poisson_lambda[i] - lgammaf(observed_counts[gtid] + 1)) + logf(counts[i_offset + i] / sum));
   }

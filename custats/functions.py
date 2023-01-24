@@ -32,6 +32,8 @@ def poisson_logpmf(k, r):
     return NotImplemented
 
 def experimental_logpmf(observed_counts, counts, base_lambda, error_rate):
+    assert counts.shape[1] == 15, f"Number of model counts must be 15. Encountered {counts.shape[1]}"
+    #assert counts.shape[1] == 5, f"Number of model counts must be 5. Encountered {counts.shape[1]}"
     out = __cp.zeros_like(observed_counts, dtype=__np.float32)
     n_counts = counts.shape[0]
     __backend_logpmf(
