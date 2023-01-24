@@ -1,4 +1,4 @@
-## CuCounter: A Python *k*mer frequency counter object based on a massively parallel CUDA hash table
+## CuStats: A Python library with GPU accelerated statistical functions used in graph-based and alignment-free genotyping
 
 ## Installation
 CuStats requires NumPy and CuPy. It also currently only supports Nvidia GPUs with CUDA.
