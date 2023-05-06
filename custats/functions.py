@@ -64,10 +64,28 @@ def logpmf(k, r):
     return NotImplemented
 
 def experimental_logpmf(observed_counts, counts, base_lambda, error_rate):
-    """Experimental CUDA implementation of the outer function using LOGPMF in KAGE."""
+    """Experimental CUDA implementation of the outer function using LOGPMF in KAGE"""
     assert counts.shape[1] == 15, f"Number of model counts must be 15. Encountered {counts.shape[1]}"
     out = __cp.zeros_like(observed_counts, dtype=__np.float32)
     n_counts = counts.shape[0]
     __backend_logpmf(
         observed_counts.data.ptr, counts.data.ptr, n_counts, base_lambda, error_rate, out.data.ptr)
     return out
+
+def numpy_experimental_logpmf(observed_counts, counts, base_lambda, error_rate):
+    """The LOGPMF context functions in KAGE"""
+    sums = __np.sum(counts, axis=-1)[:, None]
+    frequencies = __np.log(counts / sums)
+    poisson_lambda = (__np.arange(counts.shape[1])[None, :] + error_rate) * base_lambda
+    prob = numpy_logpmf(observed_counts[:, None], poisson_lambda)
+    prob = logsumexp(frequencies + prob, axis=-1)
+    return prob
+
+def cupy_experimental_logpmf(observed_counts, counts, base_lambda, error_rate):
+    """The LOGPMF context functions in KAGE"""
+    sums = __cp.sum(counts, axis=-1)[:, None]
+    frequencies = __cp.log(counts / sums)
+    poisson_lambda = (__cp.arange(counts.shape[1])[None, :] + error_rate) * base_lambda
+    prob = cupy_logpmf(observed_counts[:, None], poisson_lambda)
+    prob = logsumexp(frequencies + prob, axis=-1)
+    return prob
