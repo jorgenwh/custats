@@ -5,6 +5,7 @@ import cupy as cp
 import scipy
 
 from custats import poisson_logpmf
+from custats import experimental_logpmf
 
 def numpy_poisson_logpmf(k, r):
     return k * np.log(r) - r - scipy.special.gammaln(k+1)

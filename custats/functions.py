@@ -1,14 +1,46 @@
 import numpy as __np
 import cupy as __cp
+import scipy as __scipy
+import cupyx as __cupyx
 
 from custats_backend import poisson_logpmf_hh2h as __poisson_logpmf_hh2h
 from custats_backend import poisson_logpmf_dh2d as __poisson_logpmf_dh2d
 from custats_backend import poisson_logpmf_hd2d as __poisson_logpmf_hd2d
 from custats_backend import poisson_logpmf_dd2d as __poisson_logpmf_dd2d
-
 from custats_backend import _logpmf as __backend_logpmf
 
-def poisson_logpmf(k, r):
+def numpy_logpmf(k, r):
+    """NumPy-based Poisson Log Probability Mass Function
+
+    Input:
+        k: (numpy.ndarray) Number of observed events.
+        r: (numpy.ndarray) Poisson rate parameter.
+    Output:
+        (numpy.ndarray) Log probability mass function.
+    """
+    return k * __np.log(r) - r - __scipy.special.gammaln(k+1)
+
+def cupy_logpmf(k, r):
+    """GPU Accelerated Poisson Log Probability Mass Function using CuPy as a drop-in replacement for NumPy
+
+    Input:
+        k: (cupy.ndarray) Number of observed events.
+        r: (cupy.ndarray) Poisson rate parameter.
+    Output:
+        (cupy.ndarray) Log probability mass function.
+    """
+    return k * __cp.log(r) - r - __cupyx.scipy.special.gammaln(k+1)
+
+def logpmf(k, r):
+    """
+    GPU Accelerated Poisson Log Probability Mass Function.
+
+    Input:
+        k: (numpy.ndarray, cupy.ndarray) Number of observed events.
+        r: (numpy.ndarray, cupy.ndarray) Poisson rate parameter.
+    Output:
+        (numpy.ndarray, cupy.ndarray) Log probability mass function.
+    """
     assert k.dtype == __np.int32, "k.dtype must be np.int32"
     assert r.dtype == __np.float64, "r.dtype must be np.float64"
     assert k.shape == r.shape, "k and r must have equal shapes"
@@ -32,8 +64,8 @@ def poisson_logpmf(k, r):
     return NotImplemented
 
 def experimental_logpmf(observed_counts, counts, base_lambda, error_rate):
+    """Experimental CUDA implementation of the outer function using LOGPMF in KAGE."""
     assert counts.shape[1] == 15, f"Number of model counts must be 15. Encountered {counts.shape[1]}"
-    #assert counts.shape[1] == 5, f"Number of model counts must be 5. Encountered {counts.shape[1]}"
     out = __cp.zeros_like(observed_counts, dtype=__np.float32)
     n_counts = counts.shape[0]
     __backend_logpmf(
